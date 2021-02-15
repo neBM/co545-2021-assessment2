@@ -1,6 +1,7 @@
 	# v1.2
 	- Made question numbering keep going between chunks
 	- Tweak explanation of q2 to make it a bit more clear.
+	- Add request for students to put comments in their code to show which question is being answer in each bit of code.
 
 	# v1.1
 	- Added instructions on how to import Base
