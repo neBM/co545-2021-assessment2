@@ -1,0 +1,427 @@
+\documentclass{article}
+
+\usepackage[left=3.5cm,right=3.5cm,top=3.5cm,bottom=3.5cm]{geometry}
+\usepackage{graphics}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{textcomp}
+\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{marginnote}
+
+\newcommand{\topMarks}[1]{\marginnote{(#1 marks)}}
+
+\newcommand{\solution}{\vspace{1em}\textcolor{red}{\textbf{Solution:}}}
+
+\CustomVerbatimEnvironment{EVerbatim}{Verbatim}{
+xleftmargin=0.5cm,
+xrightmargin=0.2cm,commandchars=\\\{\},numbersep=0.9em,fontsize=\footnotesize}
+
+
+\CustomVerbatimEnvironment{SVerbatim}{Verbatim}{formatcom=\color{blue},
+xleftmargin=0.5cm,
+xrightmargin=0.2cm,commandchars=\\\{\},numbersep=0.9em}
+
+\date{}
+\title{\vspace{-5em}CO545 Assessment 2 -- Adventure Game
+{\footnotesize{(Brief v1.1)}}}
+
+\begin{document}
+\maketitle
+\vspace{-5em}
+\hrule
+\vspace{1em}
+
+\section{Overview}
+
+In this assessment, you are going to make a text-based aventure game
+in Haskell.\footnote{I am aware that your CO520 assessment was also a
+  text adventure game. This provides a very useful comparison between
+  the two styles/paradigms of programming. The particulars of the
+  implementation and what is required of you will be quite different
+  here. } The next three classes (week 17-19) will provide time
+to work through each part of the assessment in chunks (but feel free
+to jump ahead if you wish).
+
+\textbf{This work must be your own}, but you may ask your class supervisor
+for help, and they are able to give you hints as part of the class.
+
+\paragraph{Formatting and submission instructions}
+%
+\begin{itemize}[itemsep=0.1em]
+\item Download \texttt{Base.hs} from the Moodle which provides core
+  data types and helpers.
+
+\item You may modify the base if you wish for the last question of
+  \textit{Chunk 3}, but please do the bulk of your work in a new file
+  \texttt{Game.hs} which imports the base by including at the top:
+%
+\begin{align*}
+\texttt{import Base}
+\end{align*}
+%
+
+\item When submitting, create a zip file named after your user id,
+  e.g. \texttt{dao7.zip}, containing your main code as
+  \texttt{Game.hs} and including your \texttt{Base.hs} file;
+
+\item Please limit your line lengths to 100 characters max.
+\end{itemize}
+%
+
+\subsection{Base module}
+
+This \texttt{Base.hs} module provides some key data types for
+the game and some helper functions for outputting information
+to the user:
+%
+\begin{itemize}
+\item \texttt{GameState} -- holds a \texttt{Player} value and the
+  current \texttt{Room} that the player is in;
+%
+\item \texttt{Next a} -- is used to represent the idea that,
+after some command or action, either we stay the \texttt{Same} or
+\texttt{Progress} to a new \texttt{a} (this will be used as \texttt{Next
+  GameState});
+%
+\item \texttt{Item}s and \texttt{Monster}s;
+\item \texttt{Player} -- contains information about the player
+  including their inventory (a list of \texttt{Item});
+\item \texttt{Room} -- describes a room and what is available
+in it, including:
+%
+\begin{itemize}
+\item The room's name, its description, and whether it is a ``winning
+  room'' (ends the game) or not;
+\item A \texttt{Maybe Item} representing whether an item is required to enter the room;
+\item A list of \texttt{Item}s (each paired with a \texttt{String}
+  description of where the item is located);
+\item A list of \texttt{Monster}s;
+\item An association list (list of pairs) between a \texttt{Direction}
+  and a \texttt{Room};
+\item A function representing actions possible in this room,
+which takes an \texttt{Item} as input, a \texttt{GameState} as input,
+and produces a \texttt{NextGameState}.
+\end{itemize}
+%
+\item \texttt{tellContext} which takes a game state and outputs
+the current room information.
+\end{itemize}
+%
+Make sure you familiarise yourself with \texttt{Base.hs} and
+understand each part of it.
+
+\section*{Chunk 1 - Creating a map (30 marks)}
+
+The following guides you to create a minimal map. You may create
+something more elaborate (please not too elaborate!) but the following
+components are required and will be marked.
+
+Please feel free to chose the names and descriptions of rooms and the
+positions of objects (any \texttt{String} piece of data is
+your creative choice).
+
+\begin{enumerate}
+\item \topMarks{3} As a warmup (and a useful function for later)
+  define a function \texttt{opposite} which computes a direction's
+  opposite, e.g., \texttt{opposite North = South}. Include the type signature.
+
+\item \topMarks{3} In order to create rooms, we are going to first need a simple
+  function to represent a lack of actions in a room, which can be used
+  for a room's \texttt{actions} field. Define a function:
+%
+\begin{align*}
+\texttt{noActions :: Item -> GameState -> Next GameState}
+\end{align*}
+%
+which returns a \texttt{Same} value with a message that there is
+nothing that can be done with the item given (you can use
+\texttt{show} on an \texttt{Item}).
+
+\item \topMarks{4} Define a winning room (has \texttt{isWinRoom} value as
+  \texttt{True}) which requires a key to enter, has no items or
+  monster or further doors, and no actions (use the function you
+  defined above).
+
+\item \topMarks{5} Define a starting room for your player from which the
+  \texttt{winRoom} can be accessed and which has a spoon as one of its
+  items (and no actions). This starting room should lead off to
+  another room defined in the next question.
+
+\item \topMarks{12} Define a room leading from the previous containing a wood troll with
+  health \texttt{10} who holds a \texttt{Key}.  Implement an
+  ``action'' function which on a \texttt{Spoon} input checks if the
+  room (provided by the \texttt{GameState} parameter) has a monster:
+ %
+ \begin{itemize}
+ \item If no monster, indicate (via \texttt{Same}) that we stay
+   in the same state, giving an appropriate message.
+
+  \item If there is a monster, we will attack it with the spoon (which
+    deals 5 damage). If the monster has health less than or equal to 5
+    before we attack then this action will kill it, so
+    return a next game state where the monster is no longer present (not in the list) and
+    the item it was \texttt{holding} is now put into the room's items.
+
+    If the monster has $> 5$ health, update the monster's health in the
+    room to be $5$ less.
+
+    Include appropriate messages.
+\end{itemize}
+
+\item \topMarks{3} Define \texttt{game0} as an initial \texttt{GameState} pointing to your
+start room and with a player who has an empty inventory.
+\end{enumerate}
+
+\newpage
+
+\section*{Chunk 2 - Parsing commands and simple I/O (25 marks)}
+
+The \texttt{Base} module provides the \texttt{Parsable} type class
+with \texttt{parse :: String -> Maybe a}.
+
+\begin{enumerate}[leftmargin=1.4em]
+\item Implement a \texttt{Parsable} instance for \texttt{Item}. Item
+names should be parsed lower case.
+%
+\topMarks{3}
+
+\item Implement a \texttt{Parsable} instance for \texttt{Direction}.
+Directions should be parsed lower case.
+%
+\topMarks{3}
+
+\item  \topMarks{12} Implement a \texttt{Parsable} instance for \texttt{Command}
+  which parses the following inputs to commands:
+%
+\begin{itemize}[leftmargin=1em]
+\item \texttt{go \emph{dir}} parsed to a \texttt{Move} (parsing also
+the direction \texttt{\emph{dir}});
+
+\item \texttt{grab \emph{item}} parsed to a \texttt{PickUp}
+(parsing also the item \texttt{\emph{item}});
+
+\item \texttt{use \emph{item}} parsed to a \texttt{Use} value
+(parsing also the item \texttt{\emph{item}});
+
+\item \texttt{end} parsed to \texttt{End}.
+%
+\end{itemize}
+\emph{Hint: remember strings are lists and you can pattern match on a
+  number of characters at the start of a list by nested cons patterns.}
+
+%
+\item \topMarks{3} Define a function \texttt{tellResponse}
+that takes a string and outputs it (i.e., writes to standard output)
+with the following form, e.g., where \texttt{message} is the input string here:
+%
+\begin{align*}
+\texttt{< message .}
+\end{align*}
+%
+\emph{Hint: check \texttt{tellContextLine} from \texttt{Base} for inspiration.}
+
+\item \topMarks{4} Define a function \texttt{readCommand :: IO (Maybe Command)} that
+outputs the string \texttt{"> "} using
+\texttt{putStr}\footnote{Depending on your OS you may also need to
+  evaluate \texttt{hFlush stdout} (imported from \texttt{System.IO})
+after \texttt{putStr} for a non-new-line string to appear, particularly when
+running the compiled version later.}
+and then reads a line of input from the user with \texttt{getLine}
+and returns the result of parsing the user's input string via
+\texttt{parse}.
+%
+\end{enumerate}
+
+\section*{Chunk 3 - Game engine (45 marks)}
+
+\begin{enumerate}[leftmargin=1.4em]
+
+\item \topMarks{5} As part of the game engine, items are deleted from
+  a room when they are picked up. Items are stored in an association
+  list (list of pairs), therefore define a function of the type:
+%
+\begin{align*}
+\texttt{deleteFrom :: Eq a => a -> [(a, b)] -> [(a, b)]}
+\end{align*}
+%
+which, from the second parameter, deletes the pair whose first
+component is equal to the first parameter.
+
+\item \topMarks{4} During the course of the game engine, a room may
+be recomputed (e.g., items removed, monster wounded
+or killed). When we move from one room to another, we want
+the new room to point back to the previous room we were in. Define
+a function of type:
+%
+\begin{align*}
+\texttt{leaveRoom :: Room -> Direction -> Room -> Room}
+\end{align*}
+%
+where \texttt{leaveRoom fromRoom dir toRoom} returns \texttt{toRoom}
+but whose \texttt{doors} have been updated such that the opposite
+direction is now associated to \texttt{fromRoom}.
+
+\emph{Hint: use \texttt{opposite} and
+\texttt{deleteFrom}.} You will be able to test your function
+more easily later so you might want to come back to this after
+writing something that type checks.
+
+
+\item \topMarks{15} Implement a function \texttt{step} which takes a command,
+a game state, and computes what to do next, i.e., of type:
+%
+\begin{align*}
+\texttt{step :: Command -> GameState -> Next GameState}
+\end{align*}
+%
+This function should handle each possible
+command as follows:
+%
+\begin{enumerate}
+% 8 marks
+\item \texttt{Move dir} should check
+if there is a door in that direction and if so, and if the player's
+inventory has the required item for that door, should return
+a new game state (\texttt{Progress}) where the current room of game
+state is that new room (computed using \texttt{leaveRoom})
+
+\emph{Hint: you may want to use the \texttt{lookup} function to
+lookup the door from the} \texttt{doors} \emph{association list.}
+
+%  4 marks
+\item \texttt{PickUp item} should
+remove an item from the room (\texttt{deleteFrom}) and add it to the player's
+inventory if indeed the item is in the room.
+
+Include appropriate messages, considering also the case where
+the requested item is not in this room.
+
+% 3 marks
+\item \texttt{Use item}, if the item
+is in the player's inventory, then
+apply the current room's \texttt{actions} function
+to the item to compute the next game state.
+
+Otherwise, stay in the same state with a message
+that the player doesn't have the item.
+\end{enumerate}
+
+\item \topMarks{12} Implement the functions:
+%
+\begin{align*}
+& \texttt{play :: GameState -> IO ()} \\
+& \texttt{playLoop :: GameState -> IO ()}
+\end{align*}
+%
+which should have the following behaviour:
+%
+\begin{itemize}
+\item \texttt{play} should simply report the context of the player based on the current game state
+  (using \texttt{tellContext}) and then apply \texttt{playLoop}.
+
+\emph{Hint: use sequencing of \texttt{IO} computations via either
+the \emph{do} notation or \texttt{>>=}}
+%
+\item \texttt{playLoop} should first check if the player is in the winning room
+  and if so end the game;
+\item Otherwise, read an input from the user with \texttt{getCommand}, and:
+ \begin{itemize}[leftmargin=1em]
+   \item If the command is unknown, tell the user and recurse on
+     \texttt{playLoop} with the current game state;
+   \item If the command is \texttt{End}, return after outputting an
+     appropriate message.
+   \item Otherwise, use the \texttt{step} function to determine
+     the next game state. If \texttt{Same}, show the
+     message and recurse with the current game state; if
+     \texttt{Progress}, show the message, \texttt{tellContext} for the
+     new game state, and recurse with this new game state.
+\end{itemize}
+\end{itemize}
+
+\item \topMarks{1} Define the \texttt{main} function (to make your
+code compilable as a stand-alone executable) which starts the game
+with the \texttt{game0} state (see Chunk 1 q6).
+
+\item \topMarks{8} \textbf{Bonus} Up to a maximum of 8 bonus marks for
+adding some other feature, e.g., one of:
+%
+\begin{itemize}
+\item A new item and some action demonstrating it;
+\item A new monster and action demonstrating it;
+\item A help menu;
+\item Player health / monster attacks.
+\end{itemize}
+%
+\end{enumerate}
+%
+
+\newpage
+
+\appendix
+
+\section{Example game play from my minimal model answer}
+
+\begin{EVerbatim}
+   You are in a kitchen. It is cold, dark.
+   There are doors to the south and east.
+   On a table there is a spoon.
+
+> go east
+< This door requires a key.
+> use spoon
+< You do not have a spoon.
+> grab spoon
+< You picked up the spoon.
+
+   You are in a kitchen. It is cold, dark.
+   There are doors to the south and east.
+
+> go south
+< You go through the door to the south.
+
+   You are in a garden. It is weedy.
+   There is a door to the north.
+   There is a wood troll holding a key.
+
+> use spoon
+< You attack the monster but it seems only wounded.
+
+   You are in a garden. It is weedy.
+   There is a door to the north.
+   There is a wood troll holding a key.
+
+> use spoon
+< You attack the monster with the spoon and it succumbs. It drops a key.
+
+   You are in a garden. It is weedy.
+   There is a door to the north.
+   On the floor there is a key.
+
+> grab key
+< You picked up the key.
+
+   You are in a garden. It is weedy.
+   There is a door to the north.
+
+> go noerg
+Unknown command
+> go north
+< You go through the door to the north.
+
+   You are in a kitchen. It is cold, dark.
+   There are doors to the south and east.
+
+> go east
+< You unlock the door to the east.
+
+   You are in a loot room. It is shiny. You get all the loot..
+   There is a door to the west.
+
+< You won Dominic! Well done.
+\end{EVerbatim}
+
+\end{document}
