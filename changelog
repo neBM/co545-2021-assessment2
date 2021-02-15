@@ -1,0 +1,9 @@
+	# v1.2
+	- Made question numbering keep going between chunks
+	- Tweak explanation of q2 to make it a bit more clear.
+
+	# v1.1
+	- Added instructions on how to import Base
+
+	# v1.0
+	- Initial version

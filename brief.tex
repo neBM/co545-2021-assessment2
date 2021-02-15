@@ -129,15 +129,21 @@ your creative choice).
   define a function \texttt{opposite} which computes a direction's
   opposite, e.g., \texttt{opposite North = South}. Include the type signature.
 
-\item \topMarks{3} In order to create rooms, we are going to first need a simple
-  function to represent a lack of actions in a room, which can be used
-  for a room's \texttt{actions} field. Define a function:
+  \item \topMarks{3} In order to construct a \texttt{Room} an
+  ``action'' value is needed which describes how a player can use an
+  item in a room, possibly changing the game state. This is
+  represented by function of type \texttt{Item -> GameState -> Next
+    GameState}.
+
+Define a simple such function which can be used
+  for a room's \texttt{actions} field, of type:
 %
 \begin{align*}
 \texttt{noActions :: Item -> GameState -> Next GameState}
 \end{align*}
 %
-which returns a \texttt{Same} value with a message that there is
+to represent a lack of actions in a room. Thus
+\texttt{noActions} should return a \texttt{Same} value with a message that there is
 nothing that can be done with the item given (you can use
 \texttt{show} on an \texttt{Item}).
 
@@ -183,7 +189,7 @@ start room and with a player who has an empty inventory.
 The \texttt{Base} module provides the \texttt{Parsable} type class
 with \texttt{parse :: String -> Maybe a}.
 
-\begin{enumerate}[leftmargin=1.4em]
+\begin{enumerate}[leftmargin=1.4em,resume]
 \item Implement a \texttt{Parsable} instance for \texttt{Item}. Item
 names should be parsed lower case.
 %
@@ -238,7 +244,7 @@ and returns the result of parsing the user's input string via
 
 \section*{Chunk 3 - Game engine (45 marks)}
 
-\begin{enumerate}[leftmargin=1.4em]
+\begin{enumerate}[leftmargin=1.4em,resume]
 
 \item \topMarks{5} As part of the game engine, items are deleted from
   a room when they are picked up. Items are stored in an association
