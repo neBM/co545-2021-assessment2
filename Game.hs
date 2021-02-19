@@ -51,3 +51,6 @@ instance Parsable Command where
         Nothing -> Nothing
     parse "end" = Just End
     parse _  = Nothing
+
+tellResponse :: String -> IO ()
+tellResponse message = putStrLn $ "< " ++ message ++ "."
