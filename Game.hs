@@ -60,3 +60,5 @@ deleteFrom _ [] = []
 deleteFrom x ((xa, xb):xs) | x == xa = deleteFrom x xs
                            | otherwise = (xa, xb) : deleteFrom x xs
 
+leaveRoom :: Room -> Direction -> Room -> Room
+leaveRoom fromRoom dir toRoom = toRoom{doors = (opposite dir, fromRoom) : deleteFrom (opposite dir) (doors toRoom)}
