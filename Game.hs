@@ -54,3 +54,9 @@ instance Parsable Command where
 
 tellResponse :: String -> IO ()
 tellResponse message = putStrLn $ "< " ++ message ++ "."
+
+deleteFrom :: Eq a => a -> [(a, b)] -> [(a, b)]
+deleteFrom _ [] = []
+deleteFrom x ((xa, xb):xs) | x == xa = deleteFrom x xs
+                           | otherwise = (xa, xb) : deleteFrom x xs
+
