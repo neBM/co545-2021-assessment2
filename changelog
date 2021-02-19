@@ -1,3 +1,6 @@
+	# v1.2.1
+	- Fixed a typo in q.15 (getCommand -> readCommand).
+
 	# v1.2
 	- Made question numbering keep going between chunks
 	- Tweak explanation of q2 to make it a bit more clear.
