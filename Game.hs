@@ -55,6 +55,11 @@ instance Parsable Command where
 tellResponse :: String -> IO ()
 tellResponse message = putStrLn $ "< " ++ message ++ "."
 
+readCommand :: IO (Maybe Command)
+readCommand = do
+    putStr "> "
+    fmap parse getLine
+
 deleteFrom :: Eq a => a -> [(a, b)] -> [(a, b)]
 deleteFrom _ [] = []
 deleteFrom x ((xa, xb):xs) | x == xa = deleteFrom x xs
