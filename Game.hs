@@ -62,3 +62,9 @@ deleteFrom x ((xa, xb):xs) | x == xa = deleteFrom x xs
 
 leaveRoom :: Room -> Direction -> Room -> Room
 leaveRoom fromRoom dir toRoom = toRoom{doors = (opposite dir, fromRoom) : deleteFrom (opposite dir) (doors toRoom)}
+
+exists :: Eq a => a -> [a] -> Bool
+exists _ [] = False
+exists y (x:xs) | y == x = True
+                | otherwise = exists y xs
+
