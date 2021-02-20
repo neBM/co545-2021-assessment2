@@ -90,3 +90,9 @@ step (Use item) gameState =
         actions (room gameState) item gameState
     else
         Same "Item doens't exist in inventory"
+
+play :: GameState -> IO ()
+play gameState = do
+    tellContext gameState
+    playLoop gameState
+
