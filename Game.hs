@@ -80,7 +80,7 @@ step (Move dir) gameState = case lookup dir $ doors $ room gameState of
             Progress "You enter the room using a required item" gameState{room = leaveRoom (room gameState) dir toRoom}
             else Same "You don't have the required item to enter this room!"
         Nothing -> Progress "You enter the room unhindered" gameState{room = leaveRoom (room gameState) dir toRoom}
-    Nothing -> undefined 
+    Nothing -> Same "Room undefined!" 
 step (PickUp item) gameState = case unzip (items (room gameState)) of
     (beforeItems,_) -> 
         if exists item beforeItems then
