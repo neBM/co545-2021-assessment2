@@ -101,3 +101,23 @@ play gameState = do
     tellContext gameState
     playLoop gameState
 
+playLoop :: GameState -> IO ()
+playLoop gameState | isWinRoom (room gameState) = do
+                        tellResponse "You have reached the end!"
+                   | otherwise = do
+                        maybeCommand <- readCommand
+                        case maybeCommand of
+                            Nothing -> do
+                                tellResponse "Invalid command!"
+                                playLoop gameState
+                            Just command -> 
+                                case command of
+                                    End -> tellResponse "Thank you for playing!"
+                                    _ -> case step command gameState of
+                                        Same message -> do
+                                            tellResponse message
+                                            playLoop gameState 
+                                        Progress message gameState -> do
+                                            tellResponse message
+                                            tellContext gameState
+                                            playLoop gameState
