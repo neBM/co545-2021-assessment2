@@ -16,8 +16,8 @@ startingRoom = Room { name = "Starting Room", description = "This room is the st
 woodTroll = WoodTroll { health = 10, holding = Key }
 
 action :: Item -> GameState -> Next GameState
-action Key gameState    | null $ monsters $ room gameState = Same "Action unavailable!"
-                        | otherwise = let monster : xs = monsters $ room gameState in
+action Spoon gameState | null $ monsters $ room gameState = Same "Action unavailable!"
+                       | otherwise = let monster : xs = monsters $ room gameState in
                             if health monster <= 5 then
                                 Progress "The monster has been killed!" gameState{room = (room gameState) {monsters = xs, items = (holding monster, "Monster droppings") : items (room gameState)}}
                             else
