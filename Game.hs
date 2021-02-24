@@ -23,7 +23,7 @@ action Key gameState    | null $ monsters $ room gameState = Same "Action unavai
                             else
                                 Progress "The monster has been damanged!" gameState{room = (room gameState) {monsters = monster{health = health monster - 5} : xs}}
 
-anotherRoom = Room { name = "Leading Room", description = "This room is a leading room containing a monster", isWinRoom = False, requires = Nothing, items = [(Key, "Looks like this would fit in those holes in the door...")], monsters = [woodTroll], doors = [], actions = action }
+anotherRoom = Room { name = "Leading Room", description = "This room is a leading room containing a monster", isWinRoom = False, requires = Nothing, items = [], monsters = [woodTroll], doors = [], actions = action }
 
 game0 = GS {player=Player {playerName="Foo Bar", inventory=[]}, room=startingRoom}
 
