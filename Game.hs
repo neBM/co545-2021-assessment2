@@ -68,22 +68,17 @@ deleteFrom x ((xa, xb):xs) | x == xa = deleteFrom x xs
 leaveRoom :: Room -> Direction -> Room -> Room
 leaveRoom fromRoom dir toRoom = toRoom{doors = (opposite dir, fromRoom) : deleteFrom (opposite dir) (doors toRoom)}
 
-exists :: Eq a => a -> [a] -> Bool
-exists _ [] = False
-exists y (x:xs) | y == x = True
-                | otherwise = exists y xs
-
 step :: Command -> GameState -> Next GameState
 step (Move dir) gameState = case lookup dir $ doors $ room gameState of
     Just toRoom -> case requires toRoom of
-        Just requiredItem -> if exists requiredItem (inventory (player gameState)) then
+        Just requiredItem -> if requiredItem `elem` inventory (player gameState) then
             Progress "You enter the room using a required item" gameState{room = leaveRoom (room gameState) dir toRoom}
             else Same "You don't have the required item to enter this room!"
         Nothing -> Progress "You enter the room unhindered" gameState{room = leaveRoom (room gameState) dir toRoom}
     Nothing -> Same "Room undefined!" 
 step (PickUp item) gameState = case unzip (items (room gameState)) of
     (beforeItems,_) -> 
-        if exists item beforeItems then
+        if item `elem` beforeItems then
             Progress "Item picked up" gameState{
                 room = (room gameState) {items = deleteFrom item (items (room gameState))},
                 player = (player gameState) {inventory = item : inventory (player gameState)}
@@ -91,7 +86,7 @@ step (PickUp item) gameState = case unzip (items (room gameState)) of
         else
             Same "Item doesn't exist!"
 step (Use item) gameState =
-    if exists item (inventory (player gameState)) then
+    if item `elem` inventory (player gameState) then
         actions (room gameState) item gameState
     else
         Same "Item doens't exist in inventory"
