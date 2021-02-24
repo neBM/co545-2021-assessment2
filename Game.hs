@@ -22,6 +22,7 @@ action Spoon gameState | null $ monsters $ room gameState = Same "Action unavail
                                 Progress "The monster has been killed!" gameState{room = (room gameState) {monsters = xs, items = (holding monster, "Monster droppings") : items (room gameState)}}
                             else
                                 Progress "The monster has been damanged!" gameState{room = (room gameState) {monsters = monster{health = health monster - 5} : xs}}
+action _ gameState = Same "Item unavailable!"
 
 anotherRoom = Room { name = "Leading Room", description = "This room is a leading room containing a monster", isWinRoom = False, requires = Nothing, items = [], monsters = [woodTroll], doors = [(West, winningRoom)], actions = action }
 
